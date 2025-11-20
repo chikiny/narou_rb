@@ -34,6 +34,13 @@ Narou.rb - 小説家になろうのダウンローダ＆縦書き整形＆管理
 更新履歴 - ChangeLog
 --------------------
 
+3.9.3: 2025-11-20
+-----------------
+#### 修正内容
+- tilt/erubisをtilt/erubiに変更
+参考URL
+https://github.com/whiteleaf7/narou/pull/444/commits/00bd1e0850725992e0f49f323347dca8b381cfb4
+
 3.9.2: 2025-11-11
 -----------------
 #### 修正内容

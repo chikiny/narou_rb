@@ -32,10 +32,12 @@ Gem::Specification.new do |gem|
   install_message = <<-EOS
 #{"*" * 60}
 
-3.9.2: 2025-11-11
+3.9.3: 2025-11-20
 -----------------
 #### 修正内容
-- 小説家になろうの目次・作品情報ページのレイアウト変更に追従
+- tilt/erubisをtilt/erubiに変更
+参考URL
+https://github.com/whiteleaf7/narou/pull/444/commits/00bd1e0850725992e0f49f323347dca8b381cfb4
 
 #{"*" * 60}
   EOS
@@ -59,7 +61,7 @@ Gem::Specification.new do |gem|
   gem.add_runtime_dependency 'haml', '>= 5.1.2', '< 6'
   gem.add_runtime_dependency 'memoist', '~> 0.11.0'
   gem.add_runtime_dependency 'systemu', '~> 2.6', '>= 2.6.5'
-  gem.add_runtime_dependency 'erubis', '~> 2.7'
+  gem.add_runtime_dependency 'erubi', '~> 1.13'
   gem.add_runtime_dependency 'open_uri_redirections', '~> 0.2', '>= 0.2.1'
   gem.add_runtime_dependency 'activesupport', '>= 6.1', '< 8.0'
   gem.add_runtime_dependency 'unicode-display_width', '~> 1.4'

@@ -17,6 +17,8 @@ class Device
 
       # :reek:UtilityFunction
       def get_device_root_dir(volume_name)
+        # EPUB など接続端末を持たないデバイスはボリューム名が nil
+        return nil unless volume_name
         @@mount_roots.each do |mount_root|
           path = File.join(mount_root, volume_name)
           if File.directory?(path)

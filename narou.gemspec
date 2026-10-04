@@ -38,6 +38,7 @@ Gem::Specification.new do |gem|
 - ハーメルンの目次・作品情報・作者名のレイアウト変更に追従（作品情報は Cloudflare で 403 になる ss_detail ではなく目次ページから取得）
 - カクヨムの目次データ（tableOfContentsV2）に対応
 - WEB UI をポート指定なし（リバースプロキシ・Cloudflare Tunnel 経由の https など）で開いた場合、WebSocket を同一ホストの /ws/ に wss/ws で接続するように修正
+- Linux で端末を EPUB など接続端末を持たないデバイスにしている場合、WEB UI の取り外し可否チェックでエラーが出る問題を修正
 
 #{"*" * 60}
   EOS

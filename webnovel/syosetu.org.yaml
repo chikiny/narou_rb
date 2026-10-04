@@ -12,13 +12,13 @@ append_title_to_folder_name: yes
 title_strip_pattern: null
 cookie: over18=off
 sitename: *name
-version: 1.0
+version: 1.3
 
 # ------------------------------------------------------------
 # 目次取得設定
 toc_url: https://syosetu.org/novel/\\k<ncode>/
 subtitles: |-
-  (?:<tr><td colspan=2><strong>(?<chapter>.+?)</strong></td></tr>)?<tr bgcolor="#.+?" class="bgcolor\d"><td width=60%><span id="(?<index>\d+?)">　</span> <a href=.+? style="text-decoration:none;">(?<subtitle>.+?)</a></td><td><NOBR>(?<subdate>.+?)(?:<span title="(?<subupdate>.+?)改稿">\(<u>改</u>\)</span>)?</NOBR></td></tr>
+  (?:<li class="episode-list__chapter">\s*<div class="episode-list__chapter-title">(?<chapter>.+?)</div>\s*</li>\s*)?<li class="episode-list__item">\s*<a href="\./(?<index>\d+)\.html" class="episode-list__link">\s*<span class="episode-list__mark">.*?</span>\s*<span class="episode-list__title"[^>]*>(?<subtitle>.+?)</span>\s*<time class="episode-list__date"[^>]*>(?<subdate>.+?)</time>\s*(?:<span class="episode-list__revision"(?: title="(?<subupdate>.+?)改稿")?>.*?</span>\s*)?</a>\s*</li>
 
 href: \\k<index>.html
 
@@ -26,50 +26,53 @@ error_message: 投稿者が削除、もしくは間違ったアドレスを指�
 
 # ------------------------------------------------------------
 # 本文取得設定
-
-body_pattern: |-
-  <span style="font-size:120%">.+?</span><BR><BR>
-  (?<body>.+?)
-  (?:<div id="atogaki"><br><hr><br>(?<postscript>.+?)</div>)?
-
-introduction_pattern: <div id="maegaki">(?<introduction>.+)<br><hr><br></div><
-postscript_pattern: null
+body_pattern: <div id="honbun">(?<body>.+?)</div>
+introduction_pattern: <div id="maegaki">(?<introduction>.+?)<br><hr><br></div>
+postscript_pattern: <div id="atogaki"><br><hr><br>(?<postscript>.+?)</div>
 
 illust_current_url: null
 illust_grep_pattern: <a href="(?<src>.+?)" alt="挿絵" name='img'>【挿絵表示】</a>
 
 # ------------------------------------------------------------
 # 小説情報からパースするための設定
-novel_info_url: https://syosetu.org/?mode=ss_detail&nid=\\k<ncode>
+# ss_detail はCloudflareにより403になる場合があるため、取得済みの目次を再利用する
+novel_info_url: https://syosetu.org/novel/\\k<ncode>/
 
 # タイトル
-t: タイトル</td><td.*?><a href=.+?>(?<title>.+?)</a>
+t: <span style="font-size:150%" itemprop="name">(?<title>.+?)</span>
 
-# novel_type 小説種別
-nt: 話数</td><td.*?>(?<novel_type>.+?) .+?話</td>
+# novel_type 小説種別（目次の話一覧を常に連載形式として処理）
+nt: null
 novel_type_string:
   連載(連載中): 1
   連載(未完): 1
   連載(完結): 3
   短編: 2
 
-# general_all_no 掲載話数
-ga: 話数</td><td.*?>.+? (?<general_all_no>\d+)話</td>
+# general_all_no 掲載話数（目次解析後にnarou.rbが設定）
+ga: null
 
 # story あらすじ
-s: "あらすじ</td><td.*?>(?<story>.+?)</td>"
+s: <hr style="margin:20px 0px;"></div>\s*<div class="ss">(?<story>.+?)\s*<hr style="margin:20px 0px;"></div>\s*<div class="ss">\s*<section class="episode-list"
 
 # general_firstup 初回掲載日
-gf: 掲載開始</td><td.*?>(?<general_firstup>.+?)</td>
+gf: <time class="episode-list__date"[^>]*>(?<general_firstup>.+?)</time>
 
 # novelupdated_at 小説の更新時刻
 nu: null
 
 # general_lastup 最終掲載日
-gl: 最新投稿</td><td.*?>(?<general_lastup>.+?)</td>
+gl: <section class="episode-list".*<time class="episode-list__date"[^>]*>(?<general_lastup>.+?)</time>
 
 # writer 作者名
-w: 作者</td><td.*?>(?:<a href=.+?>)?(?<writer>.+?)(?:</a>)?</td>
+# 現行ページは作者名を itemprop="author" の中の itemprop="name" span に入れる。
+# 2つ目は旧形式（author span 直下に作者名）のフォールバック。
+# どちらも author ラッパーを必須にして、おすすめ作品欄の作者名に誤マッチしないようにする。
+w:
+  - |-
+    作者：\s*<span\b[^>]*itemprop=["']author["'][^>]*>\s*(?:<a\b[^>]*>)?\s*<span\b[^>]*itemprop=["']name["'][^>]*>\s*(?<writer>[^<]+?)\s*</span>\s*(?:</a>)?\s*</span>
+  - |-
+    作者：\s*<span\b[^>]*itemprop=["']author["'][^>]*>\s*(?:<a\b[^>]*>)?\s*(?<writer>[^<]+?)\s*(?:</a>)?\s*</span>
 
-# length 文字数
-l: 合計文字数</td><td.*?>(?<length>.+?)文字
+# length 文字数（目次ページには掲載されないため未設定）
+l: null

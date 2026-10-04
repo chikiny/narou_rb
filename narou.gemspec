@@ -32,12 +32,12 @@ Gem::Specification.new do |gem|
   install_message = <<-EOS
 #{"*" * 60}
 
-3.9.3: 2025-11-20
+3.9.4: 2026-10-04
 -----------------
 #### 修正内容
-- tilt/erubisをtilt/erubiに変更
-参考URL
-https://github.com/whiteleaf7/narou/pull/444/commits/00bd1e0850725992e0f49f323347dca8b381cfb4
+- ハーメルンの目次・作品情報・作者名のレイアウト変更に追従（作品情報は Cloudflare で 403 になる ss_detail ではなく目次ページから取得）
+- カクヨムの目次データ（tableOfContentsV2）に対応
+- WEB UI をポート指定なし（リバースプロキシ・Cloudflare Tunnel 経由の https など）で開いた場合、WebSocket を同一ホストの /ws/ に wss/ws で接続するように修正
 
 #{"*" * 60}
   EOS

@@ -92,26 +92,17 @@ module Command
           display_target = "ID:#{id}　#{TermColorLight.escape(title)}"
         end
         stream_io.puts "<bold><green>#{display_target}</green></bold>".termcolor
-        stream_io.print "メールを送信しています"
-        ebook_paths.each do |ebook_path|
-          exit_mail = false
-          mail_result = nil
-          Thread.new do
-            mail_result = mailer.send(id, File.basename(ebook_path), ebook_path)
-            exit_mail = true
-          end
-          until exit_mail
-            stream_io.print "."
-            sleep(0.5)
-          end
-          stream_io.puts
-          if mail_result
-            stream_io.puts File.basename(ebook_path) + " をメールで送信しました"
-            database[id]["last_mail_date"] = Time.now if target != "hotentry"
-          else
-            stream_io.error mailer.error_message
-            exit Narou::EXIT_ERROR_CODE # next しても次も失敗する可能性が高いのでここで終了
-          end
+        ext = device ? device.ebook_file_ext : ".epub"
+        case deliver_novel(mailer, id, ebook_paths, hotentry: target == "hotentry") { Narou.get_ebook_file_paths(target, ext) }
+        when :sent
+          database[id]["last_mail_date"] = Time.now if target != "hotentry"
+        when :too_large
+          # 容量だけの問題なので、この作品は飛ばして次の作品を送る（送信記録は更新しない）
+          stream_io.error mailer.error_message
+          stream_io.puts "#{display_target} は送信を飛ばしました"
+        else
+          stream_io.error mailer.error_message
+          exit Narou::EXIT_ERROR_CODE # next しても次も失敗する可能性が高いのでここで終了
         end
       end
     rescue Interrupt
@@ -119,6 +110,51 @@ module Command
       exit Narou::EXIT_INTERRUPT
     ensure
       database.save_database if database
+    end
+
+    #
+    # 1 作品分の電子書籍を送る。:sent / :too_large / :error を返す
+    #
+    # 画像を縮小してもメールの上限を超えたときは、その作品の挿絵を無効にして（setting.ini の
+    # enable_illust = false）変換し直し、1 回だけ送り直す。設定は残るので、次からは最初から挿絵なしで変換される。
+    # 変換し直した後の電子書籍のパスはブロックで受け取る
+    #
+    def deliver_novel(mailer, id, ebook_paths, hotentry: false)
+      result = send_ebooks(mailer, id, ebook_paths)
+      return result unless result == :too_large && !hotentry
+      stream_io.puts "画像を縮小してもメールの上限を超えるため、挿絵を無効にして変換し直します"
+      return :too_large unless disable_illust_and_convert(id)
+      send_ebooks(mailer, id, yield)
+    end
+
+    def send_ebooks(mailer, id, ebook_paths)
+      ebook_paths.each do |ebook_path|
+        stream_io.print "メールを送信しています"
+        exit_mail = false
+        mail_result = nil
+        Thread.new do
+          mail_result = mailer.send(id, File.basename(ebook_path), ebook_path)
+          exit_mail = true
+        end
+        until exit_mail
+          stream_io.print "."
+          sleep(0.5)
+        end
+        stream_io.puts
+        return(mailer.too_large? ? :too_large : :error) unless mail_result
+        stream_io.puts File.basename(ebook_path) + " をメールで送信しました"
+      end
+      :sent
+    end
+
+    # 挿絵を無効にして変換し直す。すでに無効だった、または変換に失敗したときは false
+    def disable_illust_and_convert(id)
+      return false if NovelSetting.load(id)["enable_illust"] == false
+      setting = NovelSetting.create(id, true, true)
+      setting["enable_illust"] = false
+      setting.save_settings
+      stream_io.puts "setting.ini の enable_illust を false にしました"
+      Convert.execute!(id.to_s, "--no-open", io: stream_io, sync: true) == 0
     end
 
     def install_mailer_setting

@@ -61,6 +61,7 @@ class Mailer
   def send(id, message, attached_file_path = nil)
     gem "mail", "2.6.6"
     require "pony"
+    require_relative "mail_encoding_patch"
     @error_message = ""
     @too_large = false
     params = @options.dup

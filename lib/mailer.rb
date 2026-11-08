@@ -57,7 +57,9 @@ class Mailer
     params[:charset] = "UTF-8"
     params[:text_part_charset] = "UTF-8"
     if attached_file_path
-      basename = "#{id}#{extname(attached_file_path)}"
+      # Send to Kindle は添付ファイル名（拡張子を除く）を本の題名にするため、
+      # 小説 ID ではなく電子書籍ファイルの名前のまま添付する
+      basename = File.basename(attached_file_path)
       params[:attachments] = { basename => File.binread(attached_file_path) }
     end
     begin
@@ -67,14 +69,5 @@ class Mailer
       return false
     end
     true
-  end
-
-  # .kepub.epub を考慮する必要がある
-  def extname(path)
-    if File.basename(path) =~ /\A[^.]+(.+)/
-      $1
-    else
-      ""
-    end
   end
 end

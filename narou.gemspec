@@ -32,13 +32,10 @@ Gem::Specification.new do |gem|
   install_message = <<-EOS
 #{"*" * 60}
 
-3.9.4: 2026-10-04
+3.9.5: 2026-11-08
 -----------------
 #### 修正内容
-- ハーメルンの目次・作品情報・作者名のレイアウト変更に追従（作品情報は Cloudflare で 403 になる ss_detail ではなく目次ページから取得）
-- カクヨムの目次データ（tableOfContentsV2）に対応
-- WEB UI をポート指定なし（リバースプロキシ・Cloudflare Tunnel 経由の https など）で開いた場合、WebSocket を同一ホストの /ws/ に wss/ws で接続するように修正
-- Linux で端末を EPUB など接続端末を持たないデバイスにしている場合、WEB UI の取り外し可否チェックでエラーが出る問題を修正
+- mail コマンドで送る電子書籍の添付ファイル名を、小説 ID（例: 6.epub）ではなく電子書籍ファイルの名前（例: [作者] 作品名.epub）にした。Send to Kindle は添付ファイル名を本の題名にするため、Kindle 上の題名が数字にならなくなる
 
 #{"*" * 60}
   EOS

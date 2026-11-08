@@ -47,6 +47,40 @@ describe Mailer do
     expect(params[:attachments].keys).to eq ["[作者] 作品名_2.epub"]
   end
 
+  it "sends a shrunk copy under the same name when the file is over the limit" do
+    path = File.join(@dir, "[作者] 大きい作品.epub")
+    File.binwrite(path, "x" * 100)
+    shrunk = File.join(@dir, "shrunk.epub")
+    File.binwrite(shrunk, "small")
+    mailer.options = { shrink_limit_bytes: 50 }
+    allow(EbookShrinker).to receive(:shrink).and_return(EbookShrinker::Result.new(shrunk, 1))
+    params = capture_params { expect(mailer.send(5, "msg", path)).to be true }
+    expect(EbookShrinker).to have_received(:shrink).with(path, limit: 50, workdir: anything)
+    expect(params[:attachments]).to eq("[作者] 大きい作品.epub" => "small")
+    expect(params).not_to have_key(:shrink_limit_bytes)
+    expect(mailer.too_large?).to be false
+  end
+
+  it "does not send and reports too large when shrinking cannot fit the limit" do
+    path = File.join(@dir, "[作者] 大きい作品.epub")
+    File.binwrite(path, "x" * 100)
+    mailer.options = { shrink_limit_bytes: 50 }
+    allow(EbookShrinker).to receive(:shrink).and_return(nil)
+    expect(Pony).not_to receive(:mail)
+    expect(mailer.send(5, "msg", path)).to be false
+    expect(mailer.too_large?).to be true
+    expect(mailer.error_message).to include("[作者] 大きい作品.epub")
+  end
+
+  it "does not shrink a file within the default limit" do
+    path = File.join(@dir, "[作者] 作品.epub")
+    File.binwrite(path, "dummy")
+    allow(EbookShrinker).to receive(:shrink)
+    params = capture_params { mailer.send(5, "msg", path) }
+    expect(EbookShrinker).not_to have_received(:shrink)
+    expect(params[:attachments].values).to eq ["dummy"]
+  end
+
   it "sends no attachment when no file is given" do
     params = capture_params { mailer.send(5, "msg") }
     expect(params).not_to have_key(:attachments)

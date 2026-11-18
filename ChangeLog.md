@@ -1,6 +1,12 @@
 更新履歴 - ChangeLog
 ====================
 
+3.9.8: 2026-11-18
+-----------------
+#### 修正内容
+- Ruby 3.4 で bundler の下から実行すると mail が net/smtp を読み込めず失敗する問題を修正（net-smtp を依存に追加。`bundle exec rspec` で mailer_spec と mail_encoding_patch_spec が読み込めなかった）
+- バージョン情報（About 画面）のコピーライトの終了年を 2026 に更新（Narou.last_commit_year。spec が現在の年との一致を確かめるため、2026 年になって失敗していた）
+
 3.9.7: 2026-11-08
 -----------------
 #### 修正内容

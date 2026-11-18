@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    narou (3.9.7)
+    narou (3.9.8)
       activesupport (>= 6.1, < 8.0)
       diff-lcs (~> 1.2, >= 1.2.5)
       erubi (~> 1.13)
@@ -9,6 +9,7 @@ PATH
       haml (>= 5.1.2, < 6)
       mail (~> 2.6.0, >= 2.6.6)
       memoist (~> 0.11.0)
+      net-smtp (~> 0.5)
       open_uri_redirections (~> 0.2, >= 0.2.1)
       pony (~> 1, >= 1.11)
       psych (~> 4.0)
@@ -73,6 +74,10 @@ GEM
     multi_json (1.18.0)
     mustermann (2.0.2)
       ruby2_keywords (~> 0.0.1)
+    net-protocol (0.4.0)
+      timeout
+    net-smtp (0.5.2)
+      net-protocol
     nkf (0.2.0)
     nkf (0.2.0-java)
     open_uri_redirections (0.2.1)
@@ -143,6 +148,7 @@ GEM
     termcolorlight (1.1.1)
     tilt (2.6.1)
     timecop (0.9.10)
+    timeout (0.6.1)
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
     unicode-display_width (1.8.0)

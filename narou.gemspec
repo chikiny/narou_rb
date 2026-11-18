@@ -32,10 +32,11 @@ Gem::Specification.new do |gem|
   install_message = <<-EOS
 #{"*" * 60}
 
-3.9.7: 2026-11-08
+3.9.8: 2026-11-18
 -----------------
 #### 修正内容
-- mail コマンドで、英字と日本語が混ざる長い題名などの添付ファイル名が文字の途中で区切られ、1 文字欠けたり undefined method 'add_content_id' for nil で送れなかったりする問題を修正（mail 2.6.6 の encoded-word を文字の境目で区切る）
+- Ruby 3.4 で bundler の下から実行すると mail が net/smtp を読み込めず失敗する問題を修正（net-smtp を依存に追加）
+- バージョン情報（About 画面）のコピーライトの終了年を 2026 に更新
 
 #{"*" * 60}
   EOS
@@ -49,6 +50,7 @@ Gem::Specification.new do |gem|
   gem.add_runtime_dependency 'termcolorlight', '~> 1.0', '>= 1.1.1'
   gem.add_runtime_dependency 'rubyzip', '~> 2.0', '>= 2.0.0'
   gem.add_runtime_dependency 'mail', '~> 2.6.0', '>= 2.6.6'
+  gem.add_runtime_dependency 'net-smtp', '~> 0.5'
   gem.add_runtime_dependency 'pony', '~> 1', '>= 1.11'
   gem.add_runtime_dependency 'diff-lcs', '~> 1.2', '>= 1.2.5'
   gem.add_runtime_dependency 'sinatra', '~> 2.0', '>= 2.0.8.1'

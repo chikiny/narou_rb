@@ -10,6 +10,7 @@
 #
 
 require "base64"
+require "mail"
 
 module MailEncodingPatch
   MAX_WORD_BYTES = 45
